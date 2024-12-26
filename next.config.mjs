@@ -13,10 +13,11 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'imagedelivery.net',
+        hostname: '*.r2.dev',
         port: '',
       },
     ],
+    formats: ['image/avif'],
   },
 };
 

@@ -7,13 +7,12 @@ export type ImageJson = {
   url: string;
   filename: string;
   uploaded: string;
-  blurUrl: string;
 }
 
 export default async function Home() {
   const file = await fs.readFile(process.cwd() + '/public/output.json', 'utf8');
   const data = JSON.parse(file);
-  const images: ImageJson[] = data.images ?? [];
+  const images: ImageJson[] = data ?? [];
 
   return (
     <main className={styles.main}>
@@ -22,7 +21,7 @@ export default async function Home() {
 
       {images.map((image, index) => (
         <div className={styles.imageContent} key={image.id}>
-          <Image 
+          {/* <Image 
             priority={index < 3}
             key={image.id}
             src={image.url}
@@ -35,13 +34,23 @@ export default async function Home() {
               height: 'auto',
             }}
             quality={100}
-            blurDataURL={image.blurUrl}
             loading={index < 3 ? "eager" : "lazy"}
-            placeholder="blur"
+          /> */}
+          <img
+            src={image.url}
+            width={800}
+            height={536}
+            loading="lazy"
+            style={{
+              width: '100vw',
+              height: 'auto',
+              maxWidth: '800px'
+            }}
+            alt={image.filename}
           />
           <div className={styles.imageMetadata}>
             <p>{image.filename}</p>
-            <p>{(new Date(image.uploaded)).getFullYear()}</p>
+            <p>{(new Date(image.uploaded)).toLocaleString('default', { month: 'long', year: '2-digit'})}&#39;</p>
           </div>
         </div>
       ))}
