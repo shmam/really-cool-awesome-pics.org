@@ -38,7 +38,7 @@ function formatObject(element) {
 
     return {
         id: element.ETag.replace(/^"|"$/g, ''),
-        url: `${process.env.R2_PUBLIC_ENDPOINT}${element.Key}`,
+        url: `${process.env.R2_DOMAIN}${element.Key}`,
         filename: shortFilePath,
         uploaded: uploadDate,
         ext: fileExtension

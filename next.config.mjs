@@ -14,8 +14,11 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: '*.r2.dev',
-        port: '',
       },
+      {
+        protocol: 'https',
+        hostname: 'really-cool-awesome-pic-storage.org',
+      }
     ],
     formats: ['image/avif'],
   },

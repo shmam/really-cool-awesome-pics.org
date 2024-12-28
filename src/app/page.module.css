@@ -4,6 +4,13 @@
     max-width: 800px;    
 }
 
+.imageContent img {
+    width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+
 .imageMetadata {
     display: flex;
     justify-content: space-between;
@@ -14,4 +21,9 @@
 .imageMetadata p {
     margin: 0;
     font-size: small;
+}
+
+.imageMetadata a {
+    color: gray;
+    text-decoration: none;
 }

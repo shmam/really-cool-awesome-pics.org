@@ -21,41 +21,27 @@ export default async function Home() {
 
       {images.map((image, index) => (
         <div className={styles.imageContent} key={image.id}>
-          {/* <Image 
-            priority={index < 3}
-            key={image.id}
-            src={image.url}
-            alt={image.filename}
-            width={800}
-            height={536}
-            sizes="100vw"
-            style={{
-              width: '100%',
-              height: 'auto',
-            }}
-            quality={100}
-            loading={index < 3 ? "eager" : "lazy"}
-          /> */}
-          <img
-            src={image.url}
-            width={800}
-            height={536}
-            loading="lazy"
-            style={{
-              width: '100vw',
-              height: 'auto',
-              maxWidth: '800px'
-            }}
-            alt={image.filename}
-          />
+          <picture>
+            <source srcSet={image.url} type="image/avif" />
+            <img
+              src={image.url}
+              width={800}
+              height={536}
+              loading="lazy"
+              alt={image.filename}
+              decoding="async"
+            />
+          </picture>
           <div className={styles.imageMetadata}>
-            <p>{image.filename}</p>
+            <p><a href={image.url} target="_blank" rel="noopener noreferrer">{image.filename} →</a></p>
             <p>{(new Date(image.uploaded)).toLocaleString('default', { month: 'long', year: '2-digit'})}&#39;</p>
           </div>
         </div>
       ))}
 
-      <footer><a href="https://samcrochet.dev">samcrochet.dev</a></footer>
+      <footer>
+        <a href="https://samcrochet.dev">samcrochet.dev</a>
+      </footer>
     </main>
   );
 }
