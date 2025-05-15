@@ -1,43 +1,33 @@
-import Image from "next/image";
 import styles from "./page.module.css";
-import { promises as fs } from 'fs';
+import { promises as fs } from "fs";
+import ImageList from "./ImageList";
 
 export type ImageJson = {
   id: string;
   url: string;
   filename: string;
   uploaded: string;
-}
+};
 
 export default async function Home() {
-  const file = await fs.readFile(process.cwd() + '/public/output.json', 'utf8');
-  const data = JSON.parse(file);
-  const images: ImageJson[] = data ?? [];
+  const file = await fs.readFile(process.cwd() + "/public/output.json", "utf8");
+  const images: ImageJson[] = JSON.parse(file);
 
   return (
     <main className={styles.main}>
       <h1>really-cool-awesome-pics.org</h1>
-      <p>a photo blog by sam crochet, who sometimes shoots some 35mm photos</p>
+      <p>a photo blog by sam crochet, wants to share some 35mm photos</p>
+      <details>
+        <summary>more</summary>
+        <ul>
+          <li>image order is shuffed on each page load, isn&apos;t that fun?!</li>
+          <li>all photos (mostly) were taken with my konica big mini a4, and I hope it lives forever</li>
+          <li>this site is hosted completely for free on cloudflare</li>
+        </ul>
+      </details>
 
-      {images.map((image, index) => (
-        <div className={styles.imageContent} key={image.id}>
-          <picture>
-            <source srcSet={image.url} type="image/avif" />
-            <img
-              src={image.url}
-              width={800}
-              height={536}
-              loading="lazy"
-              alt={image.filename}
-              decoding="async"
-            />
-          </picture>
-          <div className={styles.imageMetadata}>
-            <p><a href={image.url} target="_blank" rel="noopener noreferrer">{image.filename} →</a></p>
-            <p>{(new Date(image.uploaded)).toLocaleString('default', { month: 'long', year: '2-digit'})}&#39;</p>
-          </div>
-        </div>
-      ))}
+
+      <ImageList images={images} />
 
       <footer>
         <a href="https://samcrochet.dev">samcrochet.dev</a>

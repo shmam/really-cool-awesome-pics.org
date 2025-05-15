@@ -14,7 +14,6 @@ const client = new S3Client({
     }
 });
 
-
 async function s3ListObjects() {
     const response = await client.send(
         new ListObjectsV2Command({
@@ -22,6 +21,12 @@ async function s3ListObjects() {
         })
     );
     return response.Contents;
+}
+
+async function localListObjects() {
+    const localDirectory = path.join(path.dirname(new URL(import.meta.url).pathname), 'photos');
+    const files = fs.readdirSync(localDirectory);
+    return files;
 }
 
 function formatObject(element) {
@@ -46,8 +51,15 @@ function formatObject(element) {
 }
 
 const s3Objects = await s3ListObjects()
+const localObjects = await localListObjects()
 
-const data = s3Objects.map(element => formatObject(element));
+const filteredS3Objects = s3Objects.filter(s3Object => {
+    return localObjects.includes(s3Object.Key);
+})
+
+const data = filteredS3Objects.map(element => formatObject(element));
+
+
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
 data.sort((a, b) => b.uploaded - a.uploaded);
