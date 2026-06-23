@@ -1,6 +1,6 @@
 import styles from "./page.module.css";
 import { promises as fs } from "fs";
-import ImageList from "./imageList";
+import ImageList from "./ImageList";
 
 export type ImageJson = {
   id: string;
