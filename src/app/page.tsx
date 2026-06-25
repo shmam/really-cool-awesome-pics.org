@@ -25,6 +25,7 @@ export default async function Home() {
           <li>this site is hosted completely (for free) on cloudflare</li>
         </ul>
       </details>
+      <p>email your favs at <a href="mailto:samuel.d.crochet@gmail.com">samuel.d.crochet@gmail.com</a></p>
       <ImageList images={images} />
       <footer>
         <a href="https://samcrochet.dev">samcrochet.dev</a>
