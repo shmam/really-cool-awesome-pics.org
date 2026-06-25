@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import styles from "./page.module.css";
 import { ImageJson } from "./page";
 import Sidebar from "./sidebar";
+import LazyImage from "./LazyImage";
 
 type ImageListProps = {
   images: ImageJson[];
@@ -43,17 +44,7 @@ export default function ImageList({ images }: ImageListProps) {
       <div>
         {shuffledImages.map((image, idx) => (
           <div className={styles.imageContent} key={image.id} data-index={idx}>
-            <picture>
-              <source srcSet={image.url} type="image/avif" />
-              <img
-                src={image.url}
-                width={800}
-                height={536}
-                loading="lazy"
-                alt={image.filename}
-                decoding="async"
-              />
-            </picture>
+            <LazyImage url={image.url} filename={image.filename} />
             <div className={styles.imageMetadata}>
               <p>
                 <a href={image.url} target="_blank" rel="noopener noreferrer">

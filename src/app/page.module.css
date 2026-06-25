@@ -11,6 +11,22 @@
     margin: 0 auto;
 }
 
+.imagePlaceholder {
+    width: 100%;
+}
+
+.imagePlaceholder.empty {
+    aspect-ratio: 800 / 536;
+    background-color: #1a1a1a;
+}
+
+.imagePlaceholder img {
+    width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+
 .imageMetadata {
     display: flex;
     justify-content: space-between;
