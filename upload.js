@@ -1,4 +1,4 @@
-import { S3Client, ListObjectsV2Command, PutObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, ListObjectsV2Command, PutObjectCommand, DeleteObjectsCommand } from "@aws-sdk/client-s3";
 import { readFile } from "node:fs/promises";
 import fs from 'fs';
 import path from 'path';
@@ -54,14 +54,33 @@ async function uploadFile(filepath, filename) {
     console.log(response);
 }
 
+async function deleteFiles(filenames) {
+    const command = new DeleteObjectsCommand({
+        Bucket: "pics",
+        Delete: {
+            Objects: filenames.map(filename => ({ Key: filename })),
+        },
+    });
+
+    const response = await client.send(command);
+    console.log(response);
+}
+
 const allFileSet = new Set(await listFiles());
 const alls3FileSet = new Set(await s3ListObjects());
 
 const filesToUpload = [...allFileSet].filter(file => !alls3FileSet.has(file));
 console.log("Files to upload:", filesToUpload);
 
-await filesToUpload.forEach(async file => {
+for (const file of filesToUpload) {
     const filePath = path.join(photosDir, file)
     console.log("Uploading", filePath);
     await uploadFile(filePath, file);
-})
+}
+
+const filesToDelete = [...alls3FileSet].filter(file => !allFileSet.has(file));
+console.log("Files to delete:", filesToDelete);
+
+if (filesToDelete.length > 0) {
+    await deleteFiles(filesToDelete);
+}
