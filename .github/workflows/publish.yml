@@ -1,0 +1,88 @@
+name: Publish
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  # Detect whether any photos changed in this push so we can decide
+  # whether the upload job needs to run before deploying.
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      photos: ${{ steps.filter.outputs.photos }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Detect photo changes
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            photos:
+              - 'photos/**'
+
+  # Sync local photos to R2. Only runs when photos/** changed (or when the
+  # workflow is dispatched manually so an operator can force a sync).
+  upload:
+    needs: changes
+    if: ${{ needs.changes.outputs.photos == 'true' || github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Sync photos to R2
+        run: node upload.js
+        env:
+          R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+
+  # Build and deploy the site. Depends on upload so that when photos change
+  # the new files are in R2 before output.json is generated. When no photos
+  # changed the upload job is skipped, and `if: always()` lets deploy still
+  # run on its own — as long as upload didn't actually fail.
+  deploy:
+    needs: [changes, upload]
+    if: ${{ always() && needs.upload.result != 'failure' && needs.upload.result != 'cancelled' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate file index
+        run: node listObjects.js
+        env:
+          R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_DOMAIN: ${{ secrets.R2_DOMAIN }}
+
+      - name: Build
+        run: npm run pages:build
+
+      - name: Deploy
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy .vercel/output/static --project-name=photo-blog
